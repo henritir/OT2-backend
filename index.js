@@ -36,6 +36,14 @@ app.get('/api/testi', async (req, res) => {
     const tulos = await suoritaKysely(kysely)
     res.send(tulos.recordset)
 })
+//Haetaan tiedot 'viinit' taulusta
+app.get('/viinit', async (req, res) => {
+    const kysely1 = 'SELECT * FROM viinit'
+    const tulos1 = await suoritaKysely(kysely1)
+    console.log("läpi")
+    res.send(tulos1.recordset)
+})
+
 
 const PORT = 3001
 app.listen(PORT, () => {
