@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
 const sql = require('mssql')
+const cors = require('cors')
+app.use(cors())
+
 
 //Määritetään objekti tietokantaan yhdistämistä varten
 const config = {
@@ -34,13 +37,13 @@ app.get('/', (req, res) => {
 app.get('/api/testi', async (req, res) => {
     const kysely = 'SELECT * FROM testi'
     const tulos = await suoritaKysely(kysely)
+    console.log(tulos)
     res.send(tulos.recordset)
 })
 //Haetaan tiedot 'viinit' taulusta
 app.get('/viinit', async (req, res) => {
-    const kysely1 = 'SELECT * FROM viinit'
+    const kysely1 = 'SELECT * FROM viinit WHERE viini_id < 101'
     const tulos1 = await suoritaKysely(kysely1)
-    console.log("läpi")
     res.send(tulos1.recordset)
 })
 
