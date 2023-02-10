@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const sql = require('mssql')
 const cors = require('cors')
+const bodyparser = require('body-parser')
+const jsonParser = bodyparser.json()
 app.use(cors())
 
 
@@ -40,11 +42,37 @@ app.get('/api/testi', async (req, res) => {
     console.log(tulos)
     res.send(tulos.recordset)
 })
+//Haetaan tiedot 'kayttajat' taulusta
+app.get('/kayttajat', async (req, res) => {
+    const kysely = 'SELECT * FROM kayttajat'
+    const tulos = await suoritaKysely(kysely)
+    console.log(tulos)
+    res.send(tulos.recordset)
+})
 //Haetaan tiedot 'viinit' taulusta
 app.get('/viinit', async (req, res) => {
     const kysely1 = 'SELECT * FROM viinit WHERE viini_id < 101'
     const tulos1 = await suoritaKysely(kysely1)
     res.send(tulos1.recordset)
+})
+//Uuden käyttäjän lisäys kayttajat tauluun
+app.post('/kayttajat', jsonParser, async (req, res) => {
+    const kayttajanimi = req.body.kayttajanimi
+    const salasana = req.body.salasana
+
+    if (!kayttajanimi || ! salasana) {
+        return res.status(400).json({
+            error: 'käyttäjänimi tai salasana puuttuu'
+        })
+    } else {
+        try {
+            await suoritaKysely(`INSERT INTO kayttajat (kayttajanimi, salasana) VALUES ('${kayttajanimi}', '${salasana}')
+            `)
+            res.status(200).send({viesti: 'Uusi käyttäjä lisätty'})
+        } catch (error) {
+            res.status(500).send({viesti: 'Käyttäjän lisäys epäonnistui'})
+        }
+    }
 })
 
 

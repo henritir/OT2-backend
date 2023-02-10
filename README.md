@@ -5,7 +5,12 @@ npm install express
 npm install --save-dev nodemon
 npm install mssql
 npm install cors //ei voi viiä dataa siinä ap repossa olevaan projektiin ilman tätä kun senkin osote on localhost --> tää korjaa sen
+npm install body-parser //post pyyntöjen json pakettien purkuun (req.body)
 testi
+
+
+
+Tein request kansion missä voi testailla esim post-pyyntöjä
 
 
 # Introduction 
