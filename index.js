@@ -55,23 +55,30 @@ app.get('/viinit', async (req, res) => {
     const tulos1 = await suoritaKysely(kysely1)
     res.send(tulos1.recordset)
 })
-//Uuden käyttäjän lisäys kayttajat tauluun
+//Uuden käyttäjän lisäys 'kayttajat' tauluun
 app.post('/kayttajat', jsonParser, async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
     const salasana = req.body.salasana
 
     if (!kayttajanimi || ! salasana) {
-        return res.status(400).json({
-            error: 'käyttäjänimi tai salasana puuttuu'
-        })
+        return res.status(400).json('käyttäjänimi tai salasana puuttuu')
     } else {
         try {
             await suoritaKysely(`INSERT INTO kayttajat (kayttajanimi, salasana) VALUES ('${kayttajanimi}', '${salasana}')
             `)
-            res.status(200).send({viesti: 'Uusi käyttäjä lisätty'})
+            res.status(200).send('Uusi käyttäjä lisätty')
         } catch (error) {
-            res.status(500).send({viesti: 'Käyttäjän lisäys epäonnistui'})
+            res.status(500).send('Käyttäjän lisäys epäonnistui')
         }
+    }
+})
+//Käyttäjän poisto 'kayttajat' taulusta käyttäjän id:n perusteella
+app.delete('/kayttajat/:kayttajaID', async (req, res) => {
+    try {
+        await suoritaKysely(`DELETE FROM kayttajat WHERE kayttajaID = ${req.params.kayttajaID}`)
+        res.status(200).send('Käyttäjä poistettu onnistuneesti')
+    } catch (error) {
+        res.status(500).send('Käyttäjän poistaminen epäonnistui')
     }
 })
 

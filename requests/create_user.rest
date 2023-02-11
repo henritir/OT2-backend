@@ -2,6 +2,6 @@ POST http://localhost:3001/kayttajat
 Content-Type: application/json
 
 {
-    "kayttajanimi": "testinen",
+    "kayttajanimi": "testitestit",
     "salasana": "salainen1"
 }
