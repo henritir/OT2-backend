@@ -2,9 +2,8 @@ const express = require('express')
 const app = express()
 const sql = require('mssql')
 const cors = require('cors')
-const bodyparser = require('body-parser')
-const jsonParser = bodyparser.json()
 app.use(cors())
+app.use(express.json())
 
 
 //Määritetään objekti tietokantaan yhdistämistä varten
@@ -56,7 +55,7 @@ app.get('/viinit', async (req, res) => {
     res.send(tulos1.recordset)
 })
 //Uuden käyttäjän lisäys 'kayttajat' tauluun
-app.post('/kayttajat', jsonParser, async (req, res) => {
+app.post('/kayttajat', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
     const salasana = req.body.salasana
 
@@ -79,6 +78,15 @@ app.delete('/kayttajat/:kayttajaID', async (req, res) => {
         res.status(200).send('Käyttäjä poistettu onnistuneesti')
     } catch (error) {
         res.status(500).send('Käyttäjän poistaminen epäonnistui')
+    }
+})
+//Käyttäjätietojen muokkaus
+app.put('/kayttajat', async (req, res) => {
+    try {
+        await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${req.body.kayttajanimi}', salasana = '${req.body.salasana}' WHERE kayttajaid = ${req.body.kayttajaid}`)
+        res.status(200).send('Käyttäjätietojen päivitys onnistui')
+    } catch (error) {
+        res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
     }
 })
 
