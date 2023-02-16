@@ -29,6 +29,15 @@ async function suoritaKysely(kysely) {
         console.log(error)
     }
 }
+//tarkastaa onko sähköposti oikeassa muodossa
+function isEmail(email) {
+    var emailFormat = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
+    if (email !== '' && email.match(emailFormat)) {
+         return true
+    } else {
+        return false
+    }    
+}
 
 app.get('/', (req, res) => {
     res.send('<h1>Viinisovellus</h1>')
@@ -58,12 +67,13 @@ app.get('/viinit', async (req, res) => {
 app.post('/kayttajat', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
     const salasana = req.body.salasana
+    const sposti = req.body.sposti
 
-    if (!kayttajanimi || ! salasana) {
-        return res.status(400).json('käyttäjänimi tai salasana puuttuu')
+    if (!kayttajanimi || !salasana || !sposti || isEmail(sposti) == false) {
+        return res.status(400).json('Käyttäjänimi, salasana tai sähköposti ei kelpaa')
     } else {
         try {
-            await suoritaKysely(`INSERT INTO kayttajat (kayttajanimi, salasana) VALUES ('${kayttajanimi}', '${salasana}')
+            await suoritaKysely(`INSERT INTO kayttajat (kayttajanimi, salasana, sposti) VALUES ('${kayttajanimi}', '${salasana}', '${sposti}')
             `)
             res.status(200).send('Uusi käyttäjä lisätty')
         } catch (error) {
@@ -82,12 +92,22 @@ app.delete('/kayttajat/:kayttajaID', async (req, res) => {
 })
 //Käyttäjätietojen muokkaus
 app.put('/kayttajat', async (req, res) => {
+    const kayttajanimi = req.body.kayttajanimi
+    const salasana = req.body.salasana
+    const sposti = req.body.sposti
+
+    if (!kayttajanimi || !salasana || !sposti || isEmail(sposti) == false) {
+        return res.status(400).json({
+            error: 'käyttäjänimi, salasana tai sähköposti ei kelpaa'
+        })
+    } else {
     try {
-        await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${req.body.kayttajanimi}', salasana = '${req.body.salasana}' WHERE kayttajaid = ${req.body.kayttajaid}`)
+        await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', salasana = '${salasana}', sposti = '${sposti}' WHERE kayttajaid = ${req.body.kayttajaid}`)
         res.status(200).send('Käyttäjätietojen päivitys onnistui')
     } catch (error) {
         res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
     }
+}
 })
 
 

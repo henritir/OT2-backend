@@ -2,6 +2,7 @@ POST http://localhost:3001/kayttajat
 Content-Type: application/json
 
 {
-    "kayttajanimi": "testitestit",
-    "salasana": "salainen1"
+    "kayttajanimi": "testi",
+    "salasana": "salainen1",
+    "sposti": "testi@sposti.com"
 }
