@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const sql = require('mssql')
 const cors = require('cors')
+const bcrypt = require("bcrypt")
 app.use(cors())
 app.use(express.json())
 
@@ -64,9 +65,9 @@ app.get('/viinit', async (req, res) => {
     res.send(tulos1.recordset)
 })
 //Uuden käyttäjän lisäys 'kayttajat' tauluun
-app.post('/kayttajat', async (req, res) => {
+app.post('/rekisteroidy', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
-    const salasana = req.body.salasana
+    const salasana = await bcrypt.hash(req.body.salasana, 10)
     const sposti = req.body.sposti
 
     if (!kayttajanimi || !salasana || !sposti || isEmail(sposti) == false) {
@@ -93,7 +94,7 @@ app.delete('/kayttajat/:kayttajaID', async (req, res) => {
 //Käyttäjätietojen muokkaus
 app.put('/kayttajat', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
-    const salasana = req.body.salasana
+    const salasana = await bcrypt.hash(req.body.salasana, 10)
     const sposti = req.body.sposti
 
     if (!kayttajanimi || !salasana || !sposti || isEmail(sposti) == false) {

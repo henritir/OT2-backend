@@ -2,8 +2,8 @@ PUT http://localhost:3001/kayttajat
 Content-Type: application/json
 
 {
-    "kayttajaid": 65,
-    "kayttajanimi": "muokkaus",
-    "salasana": "salasana",
+    "kayttajaid": 71,
+    "kayttajanimi": "muokkaus1",
+    "salasana": "salainen1",
     "sposti": "muokkaus1@sposti.com"
 }

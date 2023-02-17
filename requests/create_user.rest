@@ -1,4 +1,4 @@
-POST http://localhost:3001/kayttajat
+POST http://localhost:3001/rekisteroidy
 Content-Type: application/json
 
 {
