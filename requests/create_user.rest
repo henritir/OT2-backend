@@ -2,7 +2,7 @@ POST http://localhost:3001/rekisteroidy
 Content-Type: application/json
 
 {
-    "kayttajanimi": "testi",
-    "salasana": "salainen1",
-    "sposti": "testi@sposti.com"
+    "kayttajanimi": "user6",
+    "salasana": "password6",
+    "sposti": "user6@sposti.com"
 }

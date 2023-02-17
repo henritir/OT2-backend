@@ -74,11 +74,35 @@ app.post('/rekisteroidy', async (req, res) => {
         return res.status(400).json('Käyttäjänimi, salasana tai sähköposti ei kelpaa')
     } else {
         try {
-            await suoritaKysely(`INSERT INTO kayttajat (kayttajanimi, salasana, sposti) VALUES ('${kayttajanimi}', '${salasana}', '${sposti}')
-            `)
-            res.status(200).send('Uusi käyttäjä lisätty')
+            const kysely = await suoritaKysely(`SELECT * FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}' OR sposti = '${sposti}'`)
+            if (kysely.recordset.length != 0) {
+                res.status(400).send('Käyttäjänimi tai sähköposti on jo käytössä')
+            } else {
+                await suoritaKysely(`INSERT INTO kayttajat (kayttajanimi, salasana, sposti) VALUES ('${kayttajanimi}', '${salasana}', '${sposti}')
+                `)
+                res.status(200).send('Uusi käyttäjä lisätty')
+            }
         } catch (error) {
             res.status(500).send('Käyttäjän lisäys epäonnistui')
+        }
+    }
+})
+//Käyttäjän kirjautuminen
+app.post('/kirjaudu', async (req, res) => {
+    const kayttajanimi = req.body.kayttajanimi
+    const salasana = req.body.salasana
+    const kysely = await suoritaKysely(`SELECT * FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}'`)
+    if (kysely.recordset.length === 0) {
+        console.log('Käyttäjää ei löydy')
+        res.status(400).send('Käyttäjää ei löydy')
+    } else {
+        const salattusalasana = kysely.recordset[0].salasana
+        if (await bcrypt.compare(salasana, salattusalasana)) {
+            console.log('Kirjautuminen onnistui!')
+            res.status(200).send(`${kayttajanimi} on kirjautunut sisään`)
+        } else {
+            console.log('Väärä salasana')
+            res.status(400).send('Väärä salasana!')
         }
     }
 })
