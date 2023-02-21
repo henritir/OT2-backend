@@ -60,9 +60,14 @@ app.get('/kayttajat', async (req, res) => {
 })
 //Haetaan tiedot 'viinit' taulusta
 app.get('/viinit', async (req, res) => {
-    const kysely1 = 'SELECT * FROM viinit WHERE viini_id < 101'
-    const tulos1 = await suoritaKysely(kysely1)
-    res.send(tulos1.recordset)
+    try {
+        const kysely1 = 'SELECT * FROM viinit WHERE viini_id < 101'
+        const tulos1 = await suoritaKysely(kysely1)
+        res.status(200).send(tulos1.recordset)
+    } catch (error) {
+        res.status(500).send('viinien haku epäonnistui')
+    }
+
 })
 //Uuden käyttäjän lisäys 'kayttajat' tauluun
 app.post('/rekisteroidy', async (req, res) => {
