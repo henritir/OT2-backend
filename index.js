@@ -109,23 +109,25 @@ app.post('/rekisteroidy', async (req, res) => {
 app.post('/kirjaudu', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
     const salasana = req.body.salasana
+    try {
     const kysely = await suoritaKysely(`SELECT * FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}'`)
     if (kysely.recordset.length === 0) {
         console.log('Käyttäjää ei löydy')
         res.status(400).send('Käyttäjää ei löydy')
     } else {
-        try {        const salattusalasana = kysely.recordset[0].salasana
+                const salattusalasana = kysely.recordset[0].salasana
             if (await bcrypt.compare(salasana, salattusalasana)) {
                 console.log('Kirjautuminen onnistui!')
                 res.status(200).send(`${kayttajanimi} on kirjautunut sisään`)
             } else {
                 console.log('Väärä salasana')
                 res.status(400).send('Väärä salasana!')
-            }} catch (error) {
+            }
+        }
+        } catch (error) {
                 res.status(500).send('Kirjautuminen epäonnistui')
             }
-
-    }
+        
 })
 //Käyttäjän poisto 'kayttajat' taulusta käyttäjän id:n perusteella
 app.delete('/kayttajat/:kayttajaID', async (req, res) => {
