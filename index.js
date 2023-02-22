@@ -114,14 +114,17 @@ app.post('/kirjaudu', async (req, res) => {
         console.log('Käyttäjää ei löydy')
         res.status(400).send('Käyttäjää ei löydy')
     } else {
-        const salattusalasana = kysely.recordset[0].salasana
-        if (await bcrypt.compare(salasana, salattusalasana)) {
-            console.log('Kirjautuminen onnistui!')
-            res.status(200).send(`${kayttajanimi} on kirjautunut sisään`)
-        } else {
-            console.log('Väärä salasana')
-            res.status(400).send('Väärä salasana!')
-        }
+        try {        const salattusalasana = kysely.recordset[0].salasana
+            if (await bcrypt.compare(salasana, salattusalasana)) {
+                console.log('Kirjautuminen onnistui!')
+                res.status(200).send(`${kayttajanimi} on kirjautunut sisään`)
+            } else {
+                console.log('Väärä salasana')
+                res.status(400).send('Väärä salasana!')
+            }} catch (error) {
+                res.status(500).send('Kirjautuminen epäonnistui')
+            }
+
     }
 })
 //Käyttäjän poisto 'kayttajat' taulusta käyttäjän id:n perusteella
@@ -144,7 +147,7 @@ app.put('/kayttajat', async (req, res) => {
             error: 'käyttäjänimi, salasana tai sähköposti ei kelpaa'
         })
     } else {
-    try {
+   try { 
         await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', salasana = '${salasana}', sposti = '${sposti}' WHERE kayttajaid = ${req.body.kayttajaid}`)
         res.status(200).send('Käyttäjätietojen päivitys onnistui')
     } catch (error) {
