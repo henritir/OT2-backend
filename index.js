@@ -75,7 +75,7 @@ app.get('/viinit', async (req, res) => {
 //Haetaan viinien nimet 'viinit' taulusta autocomplete-komponenttiin
 app.get('/viinit/nimet', async (req, res) => {
     try {
-        const kysely1 = 'SELECT nimi FROM viinit;'
+        const kysely1 = 'SELECT viini_id, nimi FROM viinit;'
         const tulos1 = await suoritaKysely(kysely1)
         res.status(200).send(tulos1.recordset)
     } catch (error) {
