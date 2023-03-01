@@ -7,6 +7,8 @@ npm install mssql
 npm install cors //ei voi viiä dataa siinä ap repossa olevaan projektiin ilman tätä kun senkin osote on localhost --> tää korjaa sen
 npm install body-parser //post pyyntöjen json pakettien purkuun (req.body)//muoks.app.use(express.json) ajaakin saman asian eli body-parser turha
 npm install bcrypt
+npm install jsonwebtoken
+npm install dotenv --save
 
 
 

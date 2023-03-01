@@ -3,6 +3,8 @@ const app = express()
 const sql = require('mssql')
 const cors = require('cors')
 const bcrypt = require("bcrypt")
+const jwt = require('jsonwebtoken')
+const { TOKEN_KEY } = require('./config')
 app.use(cors())
 app.use(express.json())
 
@@ -111,14 +113,22 @@ app.post('/kirjaudu', async (req, res) => {
     const salasana = req.body.salasana
     try {
     const kysely = await suoritaKysely(`SELECT * FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}'`)
+    console.log('Käyttäjän tiedot:', kysely.recordset)
     if (kysely.recordset.length === 0) {
         console.log('Käyttäjää ei löydy')
         res.status(400).send('Käyttäjää ei löydy')
     } else {
-                const salattusalasana = kysely.recordset[0].salasana
+            const salattusalasana = kysely.recordset[0].salasana
             if (await bcrypt.compare(salasana, salattusalasana)) {
-                console.log('Kirjautuminen onnistui!')
-                res.status(200).send(`${kayttajanimi} on kirjautunut sisään`)
+                const id = kysely.recordset[0].kayttajaID
+                const tokenuser = {
+                    kayttajanimi,
+                    id
+                }
+            const token = jwt.sign(
+                tokenuser, TOKEN_KEY, {expiresIn: '1h'})
+            console.log('Kirjautuminen onnistui!')
+            res.status(200).send(`${kayttajanimi} on kirjautunut sisään, token: ${token}`)
             } else {
                 console.log('Väärä salasana')
                 res.status(400).send('Väärä salasana!')
