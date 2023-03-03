@@ -41,18 +41,21 @@ function isEmail(email) {
         return false
     }    
 }
+//dekoodaa tokenin ja palauttaa truen jos oikea token
+function onkoToken (token, id) { 
+    const decoodattuToken = jwt.verify(token, TOKEN_KEY )
+    //console.log('PARAMETRIT:', decodedToken.id, id)
+    if (decoodattuToken.id.toString() === id.toString()) {
+        return true
+    } else {
+        return false
+    }
+}
 
 app.get('/', (req, res) => {
     res.send('<h1>Viinisovellus</h1>')
 })
 
-//Haetaan tiedot 'testi' taulusta
-app.get('/api/testi', async (req, res) => {
-    const kysely = 'SELECT * FROM testi'
-    const tulos = await suoritaKysely(kysely)
-    console.log(tulos)
-    res.send(tulos.recordset)
-})
 //Haetaan tiedot 'kayttajat' taulusta
 app.get('/kayttajat', async (req, res) => {
     const kysely = 'SELECT * FROM kayttajat'
@@ -113,7 +116,6 @@ app.post('/kirjaudu', async (req, res) => {
     const salasana = req.body.salasana
     try {
     const kysely = await suoritaKysely(`SELECT * FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}'`)
-    console.log('Käyttäjän tiedot:', kysely.recordset)
     if (kysely.recordset.length === 0) {
         console.log('Käyttäjää ei löydy')
         res.status(400).send('Käyttäjää ei löydy')
@@ -139,7 +141,8 @@ app.post('/kirjaudu', async (req, res) => {
             }
         
 })
-//Käyttäjän poisto 'kayttajat' taulusta käyttäjän id:n perusteella
+/*
+//Käyttäjän poisto 'kayttajat' taulusta käyttäjän id:n perusteella(vielä kesken)
 app.delete('/kayttajat/:kayttajaID', async (req, res) => {
     try {
         await suoritaKysely(`DELETE FROM kayttajat WHERE kayttajaID = ${req.params.kayttajaID}`)
@@ -147,25 +150,23 @@ app.delete('/kayttajat/:kayttajaID', async (req, res) => {
     } catch (error) {
         res.status(500).send('Käyttäjän poistaminen epäonnistui')
     }
-})
+})*/
+
 //Käyttäjätietojen muokkaus
-app.put('/kayttajat', async (req, res) => {
+app.put('/muokkaa_kayttaja/:kayttajaID', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
     const salasana = await bcrypt.hash(req.body.salasana, 10)
     const sposti = req.body.sposti
-
-    if (!kayttajanimi || !salasana || !sposti || isEmail(sposti) == false) {
-        return res.status(400).json({
-            error: 'käyttäjänimi, salasana tai sähköposti ei kelpaa'
-        })
-    } else {
-   try { 
-        await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', salasana = '${salasana}', sposti = '${sposti}' WHERE kayttajaid = ${req.body.kayttajaid}`)
+    const id = req.params.kayttajaID
+    const token = req.headers.authorization.split(' ')[1];
+   try {
+       if (onkoToken(token, id)) {
+        await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', salasana = '${salasana}', sposti = '${sposti}' WHERE kayttajaID = ${id}`)
         res.status(200).send('Käyttäjätietojen päivitys onnistui')
+       } 
     } catch (error) {
         res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
     }
-}
 })
 
 
