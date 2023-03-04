@@ -87,6 +87,20 @@ app.get('/viinit/nimet', async (req, res) => {
 
 })
 
+//Käyttäjän tietojen (käyttäjänimi ja sposti) haku kirjautuneen
+// käyttäjän tokenin perusteella
+app.get('/kayttaja/', async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const dekoodattuToken = jwt.verify(token, TOKEN_KEY )
+        const id = dekoodattuToken.id
+        const tulos = await suoritaKysely(`SELECT kayttajanimi, sposti FROM kayttajat WHERE kayttajaID = ${id}`)
+        res.status(200).send(tulos.recordset)
+    } catch (error) {
+        res.status(500).send('Käyttäjän haku epäonnistui')
+    }
+})
+
 //Uuden käyttäjän lisäys 'kayttajat' tauluun
 app.post('/rekisteroidy', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
