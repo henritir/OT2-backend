@@ -41,16 +41,6 @@ function isEmail(email) {
         return false
     }    
 }
-//dekoodaa tokenin ja palauttaa truen jos oikea token
-function onkoToken (token, id) { 
-    const decoodattuToken = jwt.verify(token, TOKEN_KEY )
-    //console.log('PARAMETRIT:', decodedToken.id, id)
-    if (decoodattuToken.id.toString() === id.toString()) {
-        return true
-    } else {
-        return false
-    }
-}
 
 app.get('/', (req, res) => {
     res.send('<h1>Viinisovellus</h1>')
@@ -101,6 +91,21 @@ app.get('/kayttaja/', async (req, res) => {
     }
 })
 
+//Listaus käyttäjän arvostelemista viineistä
+app.get('/kayttaja/viinit', async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const dekoodattuToken = jwt.verify(token, TOKEN_KEY )
+        const id = dekoodattuToken.id
+        const tulos = await suoritaKysely(`SELECT nimi FROM viinit v
+        JOIN arvostelut a ON v.viini_id = a.viini_ID
+        WHERE a.arvostelija_ID = ${id}`)
+        res.status(200).send(tulos.recordset)
+    } catch (error) {
+        res.status(500).send('Käyttäjän haku epäonnistui')
+    }
+})
+
 //Uuden käyttäjän lisäys 'kayttajat' tauluun
 app.post('/rekisteroidy', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
@@ -117,7 +122,16 @@ app.post('/rekisteroidy', async (req, res) => {
             } else {
                 await suoritaKysely(`INSERT INTO kayttajat (kayttajanimi, salasana, sposti) VALUES ('${kayttajanimi}', '${salasana}', '${sposti}')
                 `)
-                res.status(200).send('Uusi käyttäjä lisätty')
+                const kysely2 = await suoritaKysely(`SELECT kayttajaID FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}'
+                `)
+                const id = kysely2.recordset[0].kayttajaID
+                const tokenuser = {
+                    kayttajanimi,
+                    id
+                }
+                const token = jwt.sign(
+                    tokenuser, TOKEN_KEY, {expiresIn: '1h'})
+                res.status(200).send(`Rekisteröityminen onnistui, token: ${token}`)
             }
         } catch (error) {
             res.status(500).send('Käyttäjän lisäys epäonnistui')
@@ -155,18 +169,21 @@ app.post('/kirjaudu', async (req, res) => {
             }
         
 })
-/*
-//Käyttäjän poisto 'kayttajat' taulusta käyttäjän id:n perusteella(vielä kesken)
-app.delete('/kayttajat/:kayttajaID', async (req, res) => {
+
+//Käyttäjän poisto 'kayttajat' taulusta kirjautuneen käyttäjän tokenin perusteella
+app.delete('/poista_kayttaja', async (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const dekoodattuToken = jwt.verify(token, TOKEN_KEY )
+    const id = dekoodattuToken.id
     try {
-        await suoritaKysely(`DELETE FROM kayttajat WHERE kayttajaID = ${req.params.kayttajaID}`)
+        await suoritaKysely(`DELETE FROM kayttajat WHERE kayttajaID = ${id}`)
         res.status(200).send('Käyttäjä poistettu onnistuneesti')
     } catch (error) {
         res.status(500).send('Käyttäjän poistaminen epäonnistui')
     }
-})*/
-
-//Käyttäjätietojen muokkaus
+})
+/*
+//Käyttäjätietojen muokkaus (vielä kesken)
 app.put('/muokkaa_kayttaja/:kayttajaID', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
     const salasana = await bcrypt.hash(req.body.salasana, 10)
@@ -174,14 +191,12 @@ app.put('/muokkaa_kayttaja/:kayttajaID', async (req, res) => {
     const id = req.params.kayttajaID
     const token = req.headers.authorization.split(' ')[1];
    try {
-       if (onkoToken(token, id)) {
         await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', salasana = '${salasana}', sposti = '${sposti}' WHERE kayttajaID = ${id}`)
         res.status(200).send('Käyttäjätietojen päivitys onnistui')
-       } 
     } catch (error) {
         res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
     }
-})
+})*/
 
 
 const PORT = 3001
