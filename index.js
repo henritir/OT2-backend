@@ -91,13 +91,13 @@ app.get('/kayttaja/', async (req, res) => {
     }
 })
 
-//Listaus käyttäjän arvostelemista viineistä
+//Listaus käyttäjän arvostelemista viineistä ja käyttäjän viiniarvio
 app.get('/kayttaja/viinit', async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
         const dekoodattuToken = jwt.verify(token, TOKEN_KEY)
         const id = dekoodattuToken.id
-        const tulos = await suoritaKysely(`SELECT nimi FROM viinit v
+        const tulos = await suoritaKysely(`SELECT v.*, a.arvio FROM viinit v
         JOIN arvostelut a ON v.viini_id = a.viini_ID
         WHERE a.arvostelija_ID = ${id}`)
         res.status(200).send(tulos.recordset)
