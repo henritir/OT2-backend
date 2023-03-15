@@ -108,14 +108,13 @@ app.get('/kayttaja/viinit', async (req, res) => {
 
 //Uuden käyttäjän lisäys 'kayttajat' tauluun
 app.post('/rekisteroidy', async (req, res) => {
-    const kayttajanimi = req.body.kayttajanimi
-    const salasana = await bcrypt.hash(req.body.salasana, 10)
-    const sposti = req.body.sposti
-
-    if (!kayttajanimi || !salasana || !sposti || isEmail(sposti) == false) {
-        return res.status(400).json('Käyttäjänimi, salasana tai sähköposti ei kelpaa')
-    } else {
-        try {
+    try {
+        const kayttajanimi = req.body.kayttajanimi
+        const salasana = await bcrypt.hash(req.body.salasana, 10)
+        const sposti = req.body.sposti
+        if (!kayttajanimi || !salasana || !sposti || isEmail(sposti) == false) {
+            return res.status(400).json('Käyttäjänimi, salasana tai sähköposti ei kelpaa')
+        } else {
             const kysely = await suoritaKysely(`SELECT * FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}' OR sposti = '${sposti}'`)
             if (kysely.recordset.length != 0) {
                 res.status(400).send('Käyttäjänimi tai sähköposti on jo käytössä')
@@ -133,9 +132,9 @@ app.post('/rekisteroidy', async (req, res) => {
                     tokenuser, TOKEN_KEY, { expiresIn: '1h' })
                 res.status(200).send(`Rekisteröityminen onnistui, token: ${token}`)
             }
-        } catch (error) {
-            res.status(500).send('Käyttäjän lisäys epäonnistui')
-        }
+        }  
+    } catch (error) {
+        res.status(500).send('Käyttäjän lisäys epäonnistui')
     }
 })
 //Käyttäjän kirjautuminen
