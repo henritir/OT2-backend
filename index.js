@@ -228,7 +228,8 @@ app.post('/arvosteleViini', async (req, res) => {
 })
 
 //Arvostelun muokkaus
-app.put('/muokkaa_arvostelu/:arvosteluID', async (req, res) => {
+/*
+app.patch('/muokkaa_arvostelu/:arvosteluID', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
     const arvio = req.body.arvio
     const viini_id = req.body.viini_id
@@ -245,7 +246,7 @@ app.put('/muokkaa_arvostelu/:arvosteluID', async (req, res) => {
         res.status(500).send('Arvostelun päivitys epäonnistui')
     }
 })
-
+*/
 
 const PORT = 3001
 app.listen(PORT, () => {
