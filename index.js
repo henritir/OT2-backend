@@ -212,7 +212,6 @@ app.post('/arvosteleViini', async (req, res) => {
         } else {
             const arvostelijaid = kysely.recordset[0].kayttajaID;
             const kysely1 = await suoritaKysely(`SELECT * FROM arvostelut WHERE arvostelija_ID = '${arvostelijaid}' AND viini_id = '${viini_id}'`)
-            console.log("RS: " + kysely1.recordset.length);
             if (kysely1.recordset.length > 0) {
                 res.status(403).send('Olet jo arvostellut tämän viinin!')
             } else {
