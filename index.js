@@ -129,7 +129,7 @@ app.post('/rekisteroidy', async (req, res) => {
                     id
                 }
                 const token = jwt.sign(
-                    tokenuser, TOKEN_KEY, { expiresIn: '1h' })
+                    tokenuser, TOKEN_KEY, { expiresIn: 60*60 })
                 res.status(200).send(`Rekisteröityminen onnistui, token: ${token}`)
             }
         }  
@@ -155,7 +155,7 @@ app.post('/kirjaudu', async (req, res) => {
                     id
                 }
                 const token = jwt.sign(
-                    tokenuser, TOKEN_KEY, { expiresIn: '1h' })
+                    tokenuser, TOKEN_KEY, { expiresIn: 60*60 })
                 console.log('Kirjautuminen onnistui!')
                 res.status(200).send(`${kayttajanimi} on kirjautunut sisään, token: ${token}`)
             } else {
@@ -181,21 +181,24 @@ app.delete('/poista_kayttaja', async (req, res) => {
         res.status(500).send('Käyttäjän poistaminen epäonnistui')
     }
 })
-/*
-//Käyttäjätietojen muokkaus (vielä kesken)
-app.put('/muokkaa_kayttaja/:kayttajaID', async (req, res) => {
+
+//käyttäjätietojen muokkaus
+app.patch('/muokkaa_kayttaja', async (req, res) => {
+    try {
     const kayttajanimi = req.body.kayttajanimi
-    const salasana = await bcrypt.hash(req.body.salasana, 10)
     const sposti = req.body.sposti
-    const id = req.params.kayttajaID
+    const salasana = await bcrypt.hash(req.body.salasana, 10)
     const token = req.headers.authorization.split(' ')[1];
-   try {
+    const dekoodattuToken = jwt.verify(token, TOKEN_KEY )
+    const id = dekoodattuToken.id
+    
         await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', salasana = '${salasana}', sposti = '${sposti}' WHERE kayttajaID = ${id}`)
         res.status(200).send('Käyttäjätietojen päivitys onnistui')
-    } catch (error) {
-        res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
-    }
-})*/
+            
+        } catch (error) {
+            res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
+        }
+})
 
 // POST arvostelu
 app.post('/arvosteleViini', async (req, res) => {
