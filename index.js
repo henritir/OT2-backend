@@ -200,6 +200,36 @@ app.patch('/muokkaa_kayttaja', async (req, res) => {
         }
 })
 
+//salasanan vaihto
+app.patch('/vaihda_salasanaa', async (req, res) => {
+    try {
+    const salasana = req.body.salasana
+    const uusisalasana = await bcrypt.hash(req.body.uusisalasana,10)
+    const token = req.headers.authorization.split(' ')[1];
+    const dekoodattuToken = jwt.verify(token, TOKEN_KEY )
+    const id = dekoodattuToken.id
+
+    const kysely = await suoritaKysely(`SELECT * FROM kayttajat WHERE kayttajaID = '${id}'`)
+    if (kysely.recordset.length === 0) {
+        console.log('Käyttäjää ei löydy')
+        res.status(400).send('Käyttäjää ei löydy')
+    } else {
+        const salattusalasana = kysely.recordset[0].salasana
+        if (await bcrypt.compare(salasana, salattusalasana)) {
+            await suoritaKysely(`UPDATE kayttajat SET salasana = '${uusisalasana}' WHERE kayttajaID = ${id}`)
+            res.status(200).send('Salasanan vaihto onnistui')
+
+        } else {
+            console.log('Väärä salasana')
+            res.status(400).send('Väärä salasana!')
+        }
+    }
+            
+        } catch (error) {
+            res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
+        }
+})
+
 // POST arvostelu
 app.post('/arvosteleViini', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
