@@ -212,13 +212,17 @@ app.patch('/muokkaa_kayttaja', async (req, res) => {
     try {
         const kayttajanimi = req.body.kayttajanimi
         const sposti = req.body.sposti
-        //const salasana = await bcrypt.hash(req.body.salasana, 10)
         const token = req.headers.authorization.split(' ')[1];
         const dekoodattuToken = jwt.verify(token, TOKEN_KEY)
         const id = dekoodattuToken.id
+        if (isEmail(sposti) == false) {
+            console.log('Sähköposti ei kelpaa')
+            return res.status(400).json('Sähköposti ei kelpaa')
+        } else {
 
         await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', sposti = '${sposti}' WHERE kayttajaID = ${id}`)
         res.status(200).send('Käyttäjätietojen päivitys onnistui')
+        }
 
     } catch (error) {
         res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
@@ -311,3 +315,5 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
 
+
+module.exports = app

@@ -8,7 +8,7 @@ let token
 beforeEach(async () => {
     const vastaus = await api
       .post('/kirjaudu')
-      .send({kayttajanimi: 'Liisa1', salasana: 'liisa1234'})
+      .send({kayttajanimi: 'Pentti1', salasana: 'pentti1'})
       .expect(200)
 
     token = vastaus.text.split(' ')[5]
