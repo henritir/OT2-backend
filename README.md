@@ -9,6 +9,9 @@ npm install body-parser //post pyyntöjen json pakettien purkuun (req.body)//muo
 npm install bcrypt
 npm install jsonwebtoken
 npm install dotenv --save
+npm install --save-dev jest
+npm install --save-dev cross-env
+npm install --save-dev supertest
 
 
 
