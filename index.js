@@ -29,7 +29,8 @@ async function suoritaKysely(kysely) {
         sql.close()
         return tulos
     } catch (error) {
-        console.log(error)
+        //console.log(error)
+        throw error
     }
 }
 //tarkastaa onko sähköposti oikeassa muodossa
@@ -219,13 +220,16 @@ app.patch('/muokkaa_kayttaja', async (req, res) => {
             console.log('Sähköposti ei kelpaa')
             return res.status(400).json('Sähköposti ei kelpaa')
         } else {
-
         await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', sposti = '${sposti}' WHERE kayttajaID = ${id}`)
+        console.log('Käyttäjätietojen päivitys onnistui')
         res.status(200).send('Käyttäjätietojen päivitys onnistui')
         }
-
     } catch (error) {
-        res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
+        if (error.number == 2627 || 2601) {
+            res.status(400).send('Käyttäjänimi tai sähköposti jo käytössä')
+        } else {
+            res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
+        } 
     }
 })
 
