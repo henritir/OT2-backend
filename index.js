@@ -91,6 +91,16 @@ app.post('/parhaatviinit/rajattu', async (req, res) => {
     }
 })
 
+app.get('/parhaatviinit/topkolme', async (req, res) => {
+    try {
+        const kysely = `SELECT TOP 3 viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, AVG(arvostelut.arvio) AS arvio FROM viinit INNER JOIN arvostelut ON viinit.viini_id = arvostelut.viini_ID GROUP BY viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, arvostelut.arvio ORDER BY arvostelut.arvio DESC;`
+        const tulos = await suoritaKysely(kysely);
+        res.status(200).send(tulos.recordset)
+    } catch (error) {
+        res.status(500).send('TOP 3 viinien haku epäonnistui');
+    }
+})
+
 //Haetaan viinien nimet 'viinit' taulusta autocomplete-komponenttiin
 app.get('/viinit/nimet', async (req, res) => {
     try {
@@ -220,16 +230,16 @@ app.patch('/muokkaa_kayttaja', async (req, res) => {
             console.log('Sähköposti ei kelpaa')
             return res.status(400).json('Sähköposti ei kelpaa')
         } else {
-        await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', sposti = '${sposti}' WHERE kayttajaID = ${id}`)
-        console.log('Käyttäjätietojen päivitys onnistui')
-        res.status(200).send('Käyttäjätietojen päivitys onnistui')
+            await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', sposti = '${sposti}' WHERE kayttajaID = ${id}`)
+            console.log('Käyttäjätietojen päivitys onnistui')
+            res.status(200).send('Käyttäjätietojen päivitys onnistui')
         }
     } catch (error) {
         if (error.number == 2627 || 2601) {
             res.status(400).send('Käyttäjänimi tai sähköposti jo käytössä')
         } else {
             res.status(500).send('Käyttäjätietojen päivitys epäonnistui')
-        } 
+        }
     }
 })
 
