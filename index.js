@@ -149,7 +149,7 @@ app.post('/rekisteroidy', async (req, res) => {
         const salasana = await bcrypt.hash(req.body.salasana, 10)
         const sposti = req.body.sposti
         if (!kayttajanimi || !salasana || !sposti || isEmail(sposti) == false) {
-            return res.status(400).json('Käyttäjänimi, salasana tai sähköposti ei kelpaa')
+            return res.status(400).send('Käyttäjänimi, salasana tai sähköposti ei kelpaa')
         } else {
             const kysely = await suoritaKysely(`SELECT * FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}' OR sposti = '${sposti}'`)
             if (kysely.recordset.length != 0) {
@@ -228,7 +228,7 @@ app.patch('/muokkaa_kayttaja', async (req, res) => {
         const id = dekoodattuToken.id
         if (isEmail(sposti) == false) {
             console.log('Sähköposti ei kelpaa')
-            return res.status(400).json('Sähköposti ei kelpaa')
+            return res.status(400).send('Sähköposti ei kelpaa')
         } else {
             await suoritaKysely(`UPDATE kayttajat SET kayttajanimi = '${kayttajanimi}', sposti = '${sposti}' WHERE kayttajaID = ${id}`)
             console.log('Käyttäjätietojen päivitys onnistui')
