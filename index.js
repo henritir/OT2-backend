@@ -178,6 +178,10 @@ app.post('/kirjaudu', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
     const salasana = req.body.salasana
     try {
+        if (!kayttajanimi || !salasana) {
+            console.log('Käyttäjänimi tai salasana ei kelpaa')
+            return res.status(400).send('Käyttäjänimi tai salasana ei kelpaa')
+        } else {
         const kysely = await suoritaKysely(`SELECT * FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}'`)
         if (kysely.recordset.length === 0) {
             console.log('Käyttäjää ei löydy')
@@ -199,6 +203,7 @@ app.post('/kirjaudu', async (req, res) => {
                 res.status(400).send('Väärä salasana!')
             }
         }
+    }
     } catch (error) {
         res.status(500).send('Kirjautuminen epäonnistui')
     }
