@@ -44,7 +44,7 @@ function isEmail(email) {
 }
 
 app.get('/', (req, res) => {
-    res.send('<h1>Viinisovellus</h1>')
+    res.send('<h1>Maistelu_PRO</h1>')
 })
 
 //Haetaan tiedot 'kayttajat' taulusta

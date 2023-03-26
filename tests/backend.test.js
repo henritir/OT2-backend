@@ -75,6 +75,10 @@ describe('arvostelut testausta', () => {
       WHERE arvostelija_ID = '${arvostelijaid}' AND viini_id = '${viini_id}'`)
       
       expect(tulos.recordset).toHaveLength(1)
+
+      await yhteys.request().query(`DELETE FROM arvostelut 
+      WHERE arvostelija_ID = '${arvostelijaid}' AND viini_id = '${viini_id}'`)
+      
       sql.close()
   })
 
