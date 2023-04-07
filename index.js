@@ -283,6 +283,7 @@ app.post('/arvosteleViini', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
     const arvio = req.body.arvio
     const viini_id = req.body.viini_id
+    const aikaleima = req.body.aikaleima
     try {
         const kysely = await suoritaKysely(`SELECT kayttajaID FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}'`)
         if (kysely.recordset.length === 0) {
@@ -294,7 +295,7 @@ app.post('/arvosteleViini', async (req, res) => {
                 res.status(403).send('Olet jo arvostellut tämän viinin!')
             } else {
                 try {
-                    const kysely2 = await suoritaKysely(`INSERT INTO arvostelut (arvostelija_ID, viini_ID, arvio) VALUES ('${arvostelijaid}', '${viini_id}', '${arvio}')`)
+                    const kysely2 = await suoritaKysely(`INSERT INTO arvostelut (arvostelija_ID, viini_ID, arvio, aikaleima) VALUES ('${arvostelijaid}', '${viini_id}', '${arvio}', '${aikaleima}')`)
                     res.status(200).send('Toimii')
                 } catch (error) {
                     res.status(500).send('Arviointi epäonnistui')
@@ -314,13 +315,14 @@ app.patch('/muokkaa_arvostelu/', async (req, res) => {
     const kayttajanimi = req.body.kayttajanimi
     const arvio = req.body.arvio
     const viini_id = req.body.viini_id
+    const aikaleima = req.body.aikaleima
     try {
         const kysely = await suoritaKysely(`SELECT kayttajaID FROM kayttajat WHERE kayttajanimi = '${kayttajanimi}'`)
         if (kysely.recordset.length === 0) {
             res.status(400).send('Käyttäjää ei löydy')
         } else {
             const arvostelijaid = kysely.recordset[0].kayttajaID;
-            const kysely1 = await suoritaKysely(`UPDATE arvostelut SET arvio = '${arvio}' WHERE arvostelija_ID = '${arvostelijaid}' AND viini_ID = '${viini_id}'`)
+            const kysely1 = await suoritaKysely(`UPDATE arvostelut SET arvio = '${arvio}', aikaleima = '${aikaleima}' WHERE arvostelija_ID = '${arvostelijaid}' AND viini_ID = '${viini_id}'`)
             res.status(200).send('Arvostelun päivitys onnistui')
         }
     } catch (error) {
