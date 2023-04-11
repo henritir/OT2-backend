@@ -13,7 +13,7 @@ app.use(express.json())
 const config = {
     user: 'ygroup',
     password: 'Viiniot2',
-    server: 'viiniserveri.database.windows.net',
+    server: 'viiniserveri2.database.windows.net',
     database: 'viinikanta',
     options: {
         encrypt: true
