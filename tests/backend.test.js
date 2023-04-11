@@ -12,7 +12,7 @@ let kayttajaid
 beforeEach(async () => {
     const vastaus = await api
       .post('/kirjaudu')
-      .send({kayttajanimi: 'pentti1', salasana: 'pentti1'})
+      .send({kayttajanimi: 'laura1', salasana: 'laura123'})
       .expect(200)
 
     token = vastaus.text.split(' ')[5]
@@ -55,16 +55,18 @@ describe('arvostelut testausta', () => {
       const arvio = '4'
       const viini_id = '1119'
       const arvostelijaid = kayttajaid
+      let aikaleima = new Date().toLocaleString("sv-SV").slice(0, 19).replace("T", " ")
   
       await api
       .post('/arvosteleViini')
-      .send({kayttajanimi, arvio, viini_id})
+      .send({kayttajanimi, arvio, viini_id, aikaleima})
       .expect(200)
+
 
       const yhteys = await sql.connect({
         user: 'ygroup',
         password: 'Viiniot2',
-        server: 'viiniserveri.database.windows.net',
+        server: 'viiniserveri2.database.windows.net',
         database: 'viinikanta',
         options: {
             encrypt: true
@@ -99,15 +101,16 @@ describe('arvostelut testausta', () => {
       arvio = vanha_arvio +1
     }
     const viini_id = tulos.text.split('"viini_id":')[1].split(',')[0]
+    let aikaleima = new Date().toLocaleString("sv-SV").slice(0, 19).replace("T", " ")
 
     await api
     .patch('/muokkaa_arvostelu/')
-    .send({kayttajanimi, arvio, viini_id})
+    .send({kayttajanimi, arvio, viini_id, aikaleima})
     .expect(200)
 
     expect(arvio).not.toBe(vanha_arvio)
   })
-})
+}) 
 
 
   afterAll(async () => {
