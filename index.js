@@ -133,7 +133,7 @@ app.get('/kayttaja/viinit', async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const dekoodattuToken = jwt.verify(token, TOKEN_KEY)
         const id = dekoodattuToken.id
-        const tulos = await suoritaKysely(`SELECT v.*, a.arvio FROM viinit v
+        const tulos = await suoritaKysely(`SELECT v.*, a.arvio, a.aikaleima FROM viinit v
         JOIN arvostelut a ON v.viini_id = a.viini_ID
         WHERE a.arvostelija_ID = ${id}`)
         res.status(200).send(tulos.recordset)
