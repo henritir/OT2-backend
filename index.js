@@ -57,7 +57,7 @@ app.get('/kayttajat', async (req, res) => {
 //Haetaan parhaiten arvioidut viinit ja annettujen arvioiden keskiarvot viinit- ja arviot tauluista
 app.get('/parhaatviinit', async (req, res) => {
     try {
-        const kysely1 = 'SELECT viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, AVG(arvostelut.arvio) AS arvio FROM viinit INNER JOIN arvostelut ON viinit.viini_id = arvostelut.viini_ID GROUP BY viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, arvostelut.arvio ORDER BY arvostelut.arvio DESC;'
+        const kysely1 = 'SELECT DISTINCT viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, AVG(arvostelut.arvio) AS arvio FROM viinit INNER JOIN arvostelut ON viinit.viini_id = arvostelut.viini_ID GROUP BY viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros ORDER BY AVG(arvostelut.arvio) DESC;'
         const tulos1 = await suoritaKysely(kysely1)
         res.status(200).send(tulos1.recordset)
     } catch (error) {
@@ -69,7 +69,7 @@ app.get('/parhaatviinit', async (req, res) => {
 //Parhaiden viinien rajattu haku
 app.post('/parhaatviinit/rajattu', async (req, res) => {
     try {
-        let kysely = `SELECT viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, AVG(arvostelut.arvio) AS arvio FROM viinit INNER JOIN arvostelut ON viinit.viini_id = arvostelut.viini_ID WHERE 1=1`
+        let kysely = `SELECT DISTINCT viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, AVG(arvostelut.arvio) AS arvio FROM viinit INNER JOIN arvostelut ON viinit.viini_id = arvostelut.viini_ID WHERE 1=1`
         const valmistusmaa = req.body.valmistusmaa;
         const tyyppi = req.body.tyyppi;
         const pakkaustyyppi = req.body.pakkaustyyppi;
@@ -83,7 +83,7 @@ app.post('/parhaatviinit/rajattu', async (req, res) => {
         if (pakkaustyyppi !== '') {
             kysely = kysely + ` AND viinit.pakkaustyyppi = '${pakkaustyyppi}'`
         }
-        kysely = kysely + ` GROUP BY viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, arvostelut.arvio ORDER BY arvostelut.arvio DESC`
+        kysely = kysely + ` GROUP BY viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros ORDER BY AVG(arvostelut.arvio) DESC;`
         const tulos = await suoritaKysely(kysely);
         res.status(200).send(tulos.recordset);
     } catch (error) {
@@ -93,7 +93,7 @@ app.post('/parhaatviinit/rajattu', async (req, res) => {
 
 app.get('/parhaatviinit/topkolme', async (req, res) => {
     try {
-        const kysely = `SELECT TOP 3 viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, AVG(arvostelut.arvio) AS arvio FROM viinit INNER JOIN arvostelut ON viinit.viini_id = arvostelut.viini_ID GROUP BY viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, arvostelut.arvio ORDER BY arvostelut.arvio DESC;`
+        const kysely = `SELECT TOP 3 viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros, AVG(arvostelut.arvio) AS arvio FROM viinit INNER JOIN arvostelut ON viinit.viini_id = arvostelut.viini_ID GROUP BY viinit.nimi, viinit.valmistaja, viinit.hinta, viinit.tyyppi, viinit.pakkaustyyppi, viinit.kuvaus, viinit.erityismaininta, viinit.valmistusmaa, viinit.alue, viinit.vuosikerta, viinit.rypaleet, viinit.luonnehdinta, viinit.alkoholipros ORDER BY AVG(arvostelut.arvio) DESC`
         const tulos = await suoritaKysely(kysely);
         res.status(200).send(tulos.recordset)
     } catch (error) {
