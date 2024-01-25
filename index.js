@@ -12,7 +12,7 @@ app.use(express.json())
 //Määritetään objekti tietokantaan yhdistämistä varten
 const config = {
     user: 'ygroup',
-    password: 'Viiniot2',
+    password: '',
     server: 'viiniserveri2.database.windows.net',
     database: 'viinikanta',
     options: {
